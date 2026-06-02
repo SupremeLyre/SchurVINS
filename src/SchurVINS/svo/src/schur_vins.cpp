@@ -19,6 +19,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>.
 
 #include <boost/math/distributions/chi_squared.hpp>
 #include <cmath>
+#include <iomanip>
 #include <opencv2/optflow.hpp>
 #include <sstream>
 #include <unordered_map>
@@ -30,12 +31,10 @@ SchurVINS::SchurVINS() : curr_state(new ImuState()) {
     // LOG(INFO) << "init begins";
 }
 
-void SchurVINS::InitCov() {
+void SchurVINS::InitCov(double ba_cov, double bg_cov) {
     double quat_cov = 0.0001;
     double pos_cov = 0.001;
     double vel_cov = 0.001;
-    double ba_cov = 2e-3;
-    double bg_cov = 1e-6;
     cov = Eigen::MatrixXd::Zero(15, 15);
     cov.block<3, 3>(0, 0) = Eigen::Matrix3d::Identity() * quat_cov;
     cov.block<3, 3>(3, 3) = Eigen::Matrix3d::Identity() * pos_cov;
@@ -83,6 +82,11 @@ void SchurVINS::InitObsStddev(double _obs_dev) {
     // LOG(INFO) << "obs_dev: " << obs_dev;
 }
 
+void SchurVINS::InitOutlierThreshold(double feature_px, double point_px) {
+    feature_outlier_thresh_px = feature_px;
+    point_outlier_thresh_px = point_px;
+}
+
 void SchurVINS::InitChi2(double chi2_rate) {
     chi_square_lut.clear();
     const int max_dof = 50;
@@ -93,6 +97,33 @@ void SchurVINS::InitChi2(double chi2_rate) {
     }
     lut.swap(chi_square_lut);
     // LOG(INFO) << "chi2_rate: " << chi2_rate << ", max_dof: " << max_dof;
+}
+
+void SchurVINS::InitTrace(const std::string& trace_dir) {
+    state_trace_.open(trace_dir + "/schur_state.csv");
+    if (!state_trace_.is_open()) {
+        LOG(WARNING) << "Failed to open SchurVINS state trace in " << trace_dir;
+        return;
+    }
+    state_trace_.precision(20);
+    state_trace_ << "timestamp,pos_x,pos_y,pos_z,quat_w,quat_x,quat_y,quat_z,"
+                    "vel_x,vel_y,vel_z,ba_x,ba_y,ba_z,bg_x,bg_y,bg_z,n_valid_feature\n";
+}
+
+void SchurVINS::TraceState(int num_valid_feature) {
+    if (!state_trace_.is_open() || curr_state->ts < 0) {
+        return;
+    }
+
+    const Eigen::Quaterniond& quat = curr_state->quat;
+    const Eigen::Vector3d& pos = curr_state->pos;
+    const Eigen::Vector3d& vel = curr_state->vel;
+    const Eigen::Vector3d& ba = curr_state->ba;
+    const Eigen::Vector3d& bg = curr_state->bg;
+    state_trace_ << curr_state->ts << "," << pos.x() << "," << pos.y() << "," << pos.z() << "," << quat.w() << ","
+                 << quat.x() << "," << quat.y() << "," << quat.z() << "," << vel.x() << "," << vel.y() << ","
+                 << vel.z() << "," << ba.x() << "," << ba.y() << "," << ba.z() << "," << bg.x() << "," << bg.y()
+                 << "," << bg.z() << "," << num_valid_feature << "\n";
 }
 
 void SchurVINS::AugmentState(const svo::FrameBundle::Ptr frame_bundle) {
@@ -789,6 +820,7 @@ int SchurVINS::Backward(const svo::FrameBundle::Ptr frame_bundle) {
         //           << "bg: " << bg[0] << ", " << bg[1] << ", " << bg[2];
         // LOG(INFO) << "gravity: " << gravity[0] << ", " << gravity[1] << ", " << gravity[2];
     }
+    TraceState(num_valid_feature);
 
     return num_valid_feature;
 }
@@ -810,8 +842,6 @@ bool SchurVINS::StructureOptimize(const svo::PointPtr& optimize_point) {
 }
 
 int SchurVINS::RemovePointOutliers() {
-    constexpr double MAX_REPROJECT_ERROR = 3.0;
-
     const int min_frame_idx = states_map.begin()->second->frame_bundle->getBundleId();
     const int max_frame_idx = states_map.rbegin()->second->frame_bundle->getBundleId();
 
@@ -862,7 +892,7 @@ int SchurVINS::RemovePointOutliers() {
             ++num_obs;
         }
         const double avg_error = total_error / num_obs;
-        if (avg_error > MAX_REPROJECT_ERROR) {
+        if (avg_error > point_outlier_thresh_px) {
             ++outlier_points_num;
             curr_pt->local_status_ = false;
             // curr_pt->last_structure_optim_ = -1;
@@ -877,7 +907,6 @@ int SchurVINS::RemovePointOutliers() {
 }
 
 int SchurVINS::RemoveOutliers(const svo::FrameBundle::Ptr frame_bundle) {
-    constexpr double MAX_REPROJECT_ERROR = 4.0;
     double total_error = 0;
     const svo::AugStatePtr& state = states_map.rbegin()->second;
 
@@ -904,7 +933,7 @@ int SchurVINS::RemoveOutliers(const svo::FrameBundle::Ptr frame_bundle) {
                     = (obs.head<2>() / obs.z() - Pc.head<2>() / Pc.z()) * (focal_length / level_scale);
                 total_error += r.norm();
 
-                if (r.norm() > MAX_REPROJECT_ERROR) {
+                if (r.norm() > feature_outlier_thresh_px) {
                     // curr_pt->RemoveLocalObs(state->id, frame->getNFrameIndex());
                     frame->type_vec_[i] = svo::FeatureType::kOutlier;
                     frame->seed_ref_vec_[i].keyframe.reset();

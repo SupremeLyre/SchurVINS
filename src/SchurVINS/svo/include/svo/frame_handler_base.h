@@ -216,6 +216,10 @@ struct BaseOptions
   /// schur vins
   int window_size_ = 3;
   double obs_dev_ = 2.0;
+  double schur_feature_outlier_thresh_px_ = 4.0;
+  double schur_point_outlier_thresh_px_ = 3.0;
+  double schur_ba_init_cov_ = 2e-3;
+  double schur_bg_init_cov_ = 1e-6;
 };
 
 enum class Stage {

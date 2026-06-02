@@ -86,13 +86,13 @@ img_align_min_level: 2
 
 # Reprojection
 use_async_reprojectors: False # For stereo, change it to True for multithreading.
-reprojector_max_n_kfs: 5 # Local map size. Larger is computationally more intensive. More reduces drift.
+reprojector_max_n_kfs: 8 # Local map size. Larger is computationally more intensive. More reduces drift.
 scan_epi_unit_sphere: False # for wide angle lens, set it to True.
 reproject_unconverged_seeds: True
 max_unconverged_seeds_ratio: 0.2
 
 # Pose Optimization
-poseoptim_thresh: 2.0 # Reprojection outlier threshold (px), should be larger for larger  images.
+poseoptim_thresh: 4.0 # Reprojection outlier threshold (px), should be larger for larger  images.
 poseoptim_using_unit_sphere: False # For wide angle lens, set it to True
 
 # Depth Filter
@@ -195,4 +195,8 @@ image_log_base_path: /tmp/loopclosure_log/
 
 # schurvins
 obs_dev: 2.0
-window_size: 4
+window_size: 6
+schur_feature_outlier_thresh_px: 4.0
+schur_point_outlier_thresh_px: 3.0
+schur_ba_init_cov: 2.0e-4
+schur_bg_init_cov: 1.0e-6

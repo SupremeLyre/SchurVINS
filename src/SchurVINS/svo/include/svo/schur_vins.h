@@ -32,11 +32,13 @@ class SchurVINS {
 
     void InitImuModel(double acc_n, double acc_w, double gyr_n, double gyr_w);
     void InitExtrinsic(const svo::CameraBundle::Ptr camera_bundle);
-    void InitCov();
+    void InitCov(double ba_cov, double bg_cov);
     void InitMaxState(int val);
     void InitFocalLength(double val);
     void InitObsStddev(double _obs_dev);
+    void InitOutlierThreshold(double feature_px, double point_px);
     void InitChi2(double chi2_rate);
+    void InitTrace(const std::string& trace_dir);
 
     void SetKeyframe(const bool _is_keyframe);
     void Forward(const svo::FrameBundle::Ptr frame_bundle);
@@ -81,6 +83,7 @@ class SchurVINS {
     void Solve3();
     int RemoveOutliers(const svo::FrameBundle::Ptr frame_bundle);
     int RemovePointOutliers();
+    void TraceState(int num_valid_feature);
 
    private:
     std::mutex msg_queue_mtx;
@@ -111,9 +114,12 @@ class SchurVINS {
     bool zupt_valid = false;
     double obs_dev = 1;
     double obs_invdev = 1;
+    double feature_outlier_thresh_px = 4.0;
+    double point_outlier_thresh_px = 3.0;
     double huberA = 1.5;
     double huberB = huberA * huberA;
     std::vector<double> chi_square_lut;
+    std::ofstream state_trace_;
 };
 
 namespace Utility {

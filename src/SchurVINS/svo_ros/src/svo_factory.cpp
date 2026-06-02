@@ -96,6 +96,14 @@ BaseOptions loadBaseOptions(const rclcpp::Node::SharedPtr& pnh, bool forward_def
       vk::param<double>(pnh, "global_map_timeout_sec", 2.0);
   o.window_size_ = vk::param<int>(pnh, "window_size", 5);
   o.obs_dev_ = vk::param<double>(pnh, "obs_dev", 2.0);
+  o.schur_feature_outlier_thresh_px_ =
+      vk::param<double>(pnh, "schur_feature_outlier_thresh_px", 4.0);
+  o.schur_point_outlier_thresh_px_ =
+      vk::param<double>(pnh, "schur_point_outlier_thresh_px", 3.0);
+  o.schur_ba_init_cov_ =
+      vk::param<double>(pnh, "schur_ba_init_cov", 2e-3);
+  o.schur_bg_init_cov_ =
+      vk::param<double>(pnh, "schur_bg_init_cov", 1e-6);
   return o;
 }
 

@@ -151,6 +151,8 @@ FrameHandlerBase::FrameHandlerBase(const BaseOptions& base_options, const Reproj
     double OBS_DEV = options_.obs_dev_;
 
     schur_vins_.reset(new schur_vins::SchurVINS());                                          // init Schur VINS
+    if (options_.trace_statistics)
+      schur_vins_->InitTrace(options_.trace_dir);
     schur_vins_->InitMaxState(WINDOW_SIZE);                                                  // init window size
     if (cams_->getCamera(0).getType() == vk::cameras::CameraGeometryBase::Type::kPinhole) {  // init focal length
       auto instrisics = cams_->getCameraShared(0)->getIntrinsicParameters();
@@ -162,8 +164,10 @@ FrameHandlerBase::FrameHandlerBase(const BaseOptions& base_options, const Reproj
       schur_vins_->InitFocalLength(f);
     }
     schur_vins_->InitObsStddev(OBS_DEV);      // init observation error for feature
+    schur_vins_->InitOutlierThreshold(options_.schur_feature_outlier_thresh_px_,
+                                      options_.schur_point_outlier_thresh_px_);
     schur_vins_->InitExtrinsic(this->cams_);  // init extrinscs
-    schur_vins_->InitCov();                   // init coverance
+    schur_vins_->InitCov(options_.schur_ba_init_cov_, options_.schur_bg_init_cov_);  // init coverance
     schur_vins_->InitChi2(0.95);              // init chi test ratio
     svo::LocalFeature::unit_sphere = false;   // set feature unit sphere
   }
