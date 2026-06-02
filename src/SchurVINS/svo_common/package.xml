@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>svo_common</name>
+  <description>
+    SVO common module for types and common base functionality used by other modules
+  </description>
+  <version>0.0.1</version>
+  <license>tbd</license>
+
+  <author>Christian Forster</author>
+  <author>Manuel Werlberger</author>
+  <maintainer email="forster@ifi.uzh.ch">Christian Forster</maintainer>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>svo_cmake</depend>
+  <depend>vikit_common</depend>
+  <depend>vikit_cameras</depend>
+  <depend>fast</depend>
+  <depend>glog</depend>
+  <depend>Eigen3</depend>
+  <depend>opencv</depend>
+  <depend>rclcpp</depend>
+
+  <test_depend>gtest</test_depend>
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

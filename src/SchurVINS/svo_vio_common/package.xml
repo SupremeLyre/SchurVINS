@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>svo_vio_common</name>
+  <version>0.1.4</version>
+  <description>
+    Common types and utilities for ceres backend.
+  </description>
+  <maintainer email="jhuber91@gmail.com">Jonathan Huber</maintainer>
+  <license>ZE</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>Eigen3</depend>
+  <depend>glog</depend>
+  <depend>gflags</depend>
+  <depend>minkindr</depend>
+  <depend>svo_common</depend>
+
+
+  <test_depend>gtest</test_depend>
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

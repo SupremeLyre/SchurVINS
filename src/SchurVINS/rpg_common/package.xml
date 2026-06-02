@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>rpg_common</name>
+  <version>0.0.0</version>
+  <description>
+    Common C++11 code for RPG.
+  </description>
+
+  <author>Titus Cieslewski</author>
+  <maintainer email="titus@ifi.uzh.ch">Titus Cieslewski</maintainer>
+  <license>Private</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>Eigen3</depend>
+  <depend>gflags</depend>
+  <depend>glog</depend>
+  <depend>minkindr</depend>
+  <depend>opencv</depend>
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

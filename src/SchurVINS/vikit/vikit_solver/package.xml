@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>vikit_solver</name>
+  <version>0.0.0</version>
+  <description>The vikit_solver package</description>
+
+  <maintainer email="cfo@todo.todo">cfo</maintainer>
+  <license>BSD</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>Eigen3</depend>
+  <depend>glog</depend>
+
+  <test_depend>gtest</test_depend>
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

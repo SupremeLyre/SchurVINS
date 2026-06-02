@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>svo_ros</name>
+  <version>0.1.0</version>
+  <description>
+    Visual Odometry - ROS Nodes
+  </description>
+
+  <author>Christian Forster</author>
+  <maintainer email="forster@ifi.uzh.ch">Christian Forster</maintainer>
+  <license>GPLv3</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>ament_index_cpp</depend>
+  <depend>cv_bridge</depend>
+  <depend>Eigen3</depend>
+  <depend>geometry_msgs</depend>
+  <depend>gflags</depend>
+  <depend>glog</depend>
+  <depend>message_filters</depend>
+  <depend>nav_msgs</depend>
+  <depend>opencv</depend>
+  <depend>pcl_conversions</depend>
+  <depend>pcl_ros</depend>
+  <depend>rclcpp</depend>
+  <depend>rpg_common</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>svo</depend>
+  <depend>svo_ceres_backend</depend>
+  <depend>svo_cmake</depend>
+  <depend>svo_common</depend>
+  <depend>svo_msgs</depend>
+  <depend>svo_tracker</depend>
+  <depend>tf2_ros</depend>
+  <depend>vikit_common</depend>
+  <depend>vikit_ros</depend>
+  <depend>visualization_msgs</depend>
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
